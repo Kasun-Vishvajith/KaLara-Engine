@@ -1,4 +1,5 @@
 #include "kalara/PhysicsWorld2D.hpp"
+#include "kalara/SemanticComponent.hpp"
 #include "kalara/Hierarchy.hpp"
 #include "kalara/Log.hpp"
 #include <algorithm>
@@ -62,6 +63,12 @@ void PhysicsWorld2D::resolve_collisions(Registry& registry) {
         if (!registry.has_component<BoxCollider2DComponent>(e1) ||
             !registry.has_component<TransformComponent>(e1)) continue;
 
+        // Collision layer mask filtering check
+        if (registry.has_component<SemanticComponent>(e1)) {
+            const auto& sem1 = registry.get_component<SemanticComponent>(e1);
+            (void)sem1;
+        }
+
         auto& t1 = registry.get_component<TransformComponent>(e1);
         const auto& c1 = registry.get_component<BoxCollider2DComponent>(e1);
 
@@ -77,6 +84,16 @@ void PhysicsWorld2D::resolve_collisions(Registry& registry) {
             if (!registry.has_component<BoxCollider2DComponent>(e2) ||
                 !registry.has_component<TransformComponent>(e2)) continue;
 
+            // Enforce Semantic Layer/Mask Collision Filtering
+            if (registry.has_component<SemanticComponent>(e1) && registry.has_component<SemanticComponent>(e2)) {
+                const auto& s1 = registry.get_component<SemanticComponent>(e1);
+                const auto& s2 = registry.get_component<SemanticComponent>(e2);
+
+                if (!s1.can_collide_with(s2.collision_layer) || !s2.can_collide_with(s1.collision_layer)) {
+                    continue; // Skip collision resolution if layer masks ignore each other
+                }
+            }
+
             auto& t2 = registry.get_component<TransformComponent>(e2);
             const auto& c2 = registry.get_component<BoxCollider2DComponent>(e2);
 
@@ -88,7 +105,6 @@ void PhysicsWorld2D::resolve_collisions(Registry& registry) {
             };
 
             if (box1.intersects(box2)) {
-                // Calculate overlap depth
                 float overlap_x = std::min(box1.max_x - box2.min_x, box2.max_x - box1.min_x);
                 float overlap_y = std::min(box1.max_y - box2.min_y, box2.max_y - box1.min_y);
 
@@ -98,7 +114,6 @@ void PhysicsWorld2D::resolve_collisions(Registry& registry) {
                                   registry.get_component<RigidBody2DComponent>(e2).type == BodyType2D::Dynamic;
 
                 if (overlap_x < overlap_y) {
-                    // Resolve X collision
                     float sign = (t1.position.x < t2.position.x) ? -1.0f : 1.0f;
                     if (e1_dynamic && !e2_dynamic) {
                         t1.position.x += sign * overlap_x;
@@ -108,7 +123,6 @@ void PhysicsWorld2D::resolve_collisions(Registry& registry) {
                         registry.get_component<RigidBody2DComponent>(e2).linear_velocity.x = 0.0f;
                     }
                 } else {
-                    // Resolve Y collision
                     float sign = (t1.position.y < t2.position.y) ? -1.0f : 1.0f;
                     if (e1_dynamic && !e2_dynamic) {
                         t1.position.y += sign * overlap_y;
