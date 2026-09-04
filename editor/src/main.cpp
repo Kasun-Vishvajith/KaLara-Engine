@@ -1,7 +1,10 @@
 #include "kalara/Core.hpp"
 #include "kalara/Runtime.hpp"
-#include "kalara/Scene.hpp"
-#include "kalara/SceneSerializer.hpp"
+#include "kalara/editor/EditorState.hpp"
+#include "kalara/editor/EditorHierarchyPanel.hpp"
+#include "kalara/editor/EditorInspectorPanel.hpp"
+#include "kalara/editor/EditorViewportPanel.hpp"
+#include "kalara/editor/EditorAssetBrowserPanel.hpp"
 #include "kalara/Log.hpp"
 
 int main() {
@@ -18,27 +21,28 @@ int main() {
         return 1;
     }
 
-    // 1. Create a scene with entities
-    auto active_scene = kalara::runtime::Scene::create("Editor Viewport Scene");
+    // Initialize Editor State & Panels
+    auto active_scene = kalara::runtime::Scene::create("KaLara Viewport Scene");
+    kalara::editor::EditorState::instance().set_active_scene(active_scene);
 
-    auto parent = active_scene->create_entity("CenteredQuad");
-    auto& p_trans = active_scene->registry().get_component<kalara::runtime::TransformComponent>(parent);
-    p_trans.position = {540.0f, 285.0f, 0.0f};
-    p_trans.scale = {200.0f, 150.0f, 1.0f};
-    auto& p_sprite = active_scene->registry().add_component<kalara::runtime::SpriteRendererComponent>(parent);
-    p_sprite.color = {0.2f, 0.75f, 0.65f, 1.0f};
+    kalara::editor::EditorHierarchyPanel hierarchy_panel;
+    kalara::editor::EditorInspectorPanel inspector_panel;
+    kalara::editor::EditorViewportPanel viewport_panel;
+    kalara::editor::EditorAssetBrowserPanel asset_browser_panel;
 
-    // 2. Serialize scene to disk
-    kalara::runtime::SceneSerializer serializer(active_scene);
-    serializer.serialize("sample_scene.json");
+    // Create initial scene entity and select it
+    kalara::runtime::EntityID player = hierarchy_panel.create_entity_in_scene("PlayerQuad");
+    inspector_panel.set_position(540.0f, 285.0f, 0.0f);
+    inspector_panel.set_scale(200.0f, 150.0f, 1.0f);
 
-    // 3. Deserialize scene back from disk to verify round-trip
-    auto loaded_scene = kalara::runtime::Scene::create();
-    kalara::runtime::SceneSerializer deserializer(loaded_scene);
-    deserializer.deserialize("sample_scene.json");
+    auto& sprite = active_scene->registry().add_component<kalara::runtime::SpriteRendererComponent>(player);
+    sprite.color = {0.2f, 0.75f, 0.65f, 1.0f};
 
-    KALARA_LOG_INFO("KaLara Editor active scene '{}' initialized ({} entities). Press ESC to quit.",
-                    loaded_scene->name(), loaded_scene->registry().entity_count());
+    // Save and load scene via EditorState
+    kalara::editor::EditorState::instance().save_scene("sample_scene.json");
+    kalara::editor::EditorState::instance().load_scene("sample_scene.json");
+
+    KALARA_LOG_INFO("KaLara Editor ready [Viewport, Hierarchy, Inspector, Asset Browser]. Press ESC to quit.");
 
     app.run();
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.9.0
+    VERSION 0.10.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -88,13 +88,31 @@ target_link_libraries(KaLaraRuntime
         OpenGL::GL
 )
 
+# Editor layer static library
+add_library(KaLaraEditorLib STATIC
+    editor/src/EditorState.cpp
+    editor/src/EditorHierarchyPanel.cpp
+    editor/src/EditorInspectorPanel.cpp
+    editor/src/EditorViewportPanel.cpp
+    editor/src/EditorAssetBrowserPanel.cpp
+)
+
+target_include_directories(KaLaraEditorLib
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/editor/include
+)
+
+target_link_libraries(KaLaraEditorLib
+    PUBLIC KaLaraRuntime
+)
+
 # Editor layer executable target
 add_executable(KaLaraEditor
     editor/src/main.cpp
 )
 
 target_link_libraries(KaLaraEditor
-    PRIVATE KaLaraRuntime
+    PRIVATE KaLaraEditorLib
 )
 
 # Unit test targets
@@ -162,6 +180,14 @@ target_link_libraries(KaLaraAnimationTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraEditorTest
+    tests/editor/EditorFoundationTest.cpp
+)
+
+target_link_libraries(KaLaraEditorTest
+    PRIVATE KaLaraEditorLib
+)
+
 add_executable(KaLaraSmokeTest
     tests/smoke/main.cpp
 )
@@ -179,9 +205,10 @@ add_test(NAME KaLara.Scene COMMAND KaLaraSceneTest)
 add_test(NAME KaLara.InputCamera COMMAND KaLaraInputCameraTest)
 add_test(NAME KaLara.Physics COMMAND KaLaraPhysicsTest)
 add_test(NAME KaLara.Animation COMMAND KaLaraAnimationTest)
+add_test(NAME KaLara.Editor COMMAND KaLaraEditorTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraEditorTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
