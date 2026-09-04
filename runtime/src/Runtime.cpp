@@ -1,11 +1,15 @@
 #include "kalara/Runtime.hpp"
 #include "kalara/Renderer.hpp"
 #include "kalara/AssetManager.hpp"
+#include "kalara/Input.hpp"
+#include "kalara/Camera2D.hpp"
 #include "kalara/Log.hpp"
 
 namespace kalara::runtime {
 
 static std::shared_ptr<Texture2D> s_checkerboard_texture = nullptr;
+static Camera2D s_camera{1280.0f, 720.0f};
+static core::Vector2 s_player_pos{540.0f, 285.0f};
 
 ApplicationRuntime::~ApplicationRuntime() {
     shutdown();
@@ -36,7 +40,9 @@ bool ApplicationRuntime::initialize(const core::EngineConfig& config) noexcept {
     m_renderer = std::make_unique<Renderer>();
     m_renderer->initialize(m_window->width(), m_window->height());
 
-    // Create a 64x64 RGBA checkerboard texture asset
+    s_camera.set_projection(static_cast<float>(m_window->width()), static_cast<float>(m_window->height()));
+
+    // Create checkerboard texture asset
     constexpr uint32_t tex_dim = 64;
     std::vector<uint8_t> pixels(tex_dim * tex_dim * 4);
     for (uint32_t y = 0; y < tex_dim; ++y) {
@@ -83,6 +89,17 @@ void ApplicationRuntime::run() noexcept {
 
 void ApplicationRuntime::update([[maybe_unused]] double delta_time) noexcept {
     m_frame_count++;
+
+    // Player movement controls via Input abstraction
+    float speed = 300.0f * static_cast<float>(delta_time);
+    if (Input::is_key_pressed(KeyCode::W) || Input::is_key_pressed(KeyCode::Up)) s_player_pos.y -= speed;
+    if (Input::is_key_pressed(KeyCode::S) || Input::is_key_pressed(KeyCode::Down)) s_player_pos.y += speed;
+    if (Input::is_key_pressed(KeyCode::A) || Input::is_key_pressed(KeyCode::Left)) s_player_pos.x -= speed;
+    if (Input::is_key_pressed(KeyCode::D) || Input::is_key_pressed(KeyCode::Right)) s_player_pos.x += speed;
+
+    // Smooth camera tracking
+    s_camera.set_position(s_player_pos.x - (m_window->width() * 0.5f) + 100.0f,
+                          s_player_pos.y - (m_window->height() * 0.5f) + 75.0f);
 }
 
 void ApplicationRuntime::render() noexcept {
@@ -93,9 +110,9 @@ void ApplicationRuntime::render() noexcept {
     float win_w = static_cast<float>(m_window->width());
     float win_h = static_cast<float>(m_window->height());
 
-    // Render textured quad via Asset Foundation
+    // Render player textured quad
     if (s_checkerboard_texture) {
-        m_renderer->draw_textured_quad((win_w - 200.0f) * 0.5f, (win_h - 150.0f) * 0.5f,
+        m_renderer->draw_textured_quad(s_player_pos.x, s_player_pos.y,
                                        200.0f, 150.0f, s_checkerboard_texture->renderer_id());
     }
 
@@ -115,6 +132,7 @@ void ApplicationRuntime::shutdown() noexcept {
 
     s_checkerboard_texture.reset();
     AssetManager::instance().clear_cache();
+    Input::instance().clear();
 
     if (m_renderer) {
         m_renderer.reset();
