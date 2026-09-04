@@ -62,6 +62,7 @@ desktop.ini
 
 # ===== Dependency/build caches =====
 vcpkg_installed/
+tools/w64devkit/
 .cache/
 .nuget/
 
