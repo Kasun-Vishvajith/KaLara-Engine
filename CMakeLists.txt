@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.7.0
+    VERSION 0.8.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -70,6 +70,7 @@ add_library(KaLaraRuntime STATIC
     runtime/src/SceneSerializer.cpp
     runtime/src/Input.cpp
     runtime/src/Camera2D.cpp
+    runtime/src/PhysicsWorld2D.cpp
 )
 
 target_include_directories(KaLaraRuntime
@@ -143,6 +144,14 @@ target_link_libraries(KaLaraInputCameraTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraPhysicsTest
+    tests/runtime/PhysicsTest.cpp
+)
+
+target_link_libraries(KaLaraPhysicsTest
+    PRIVATE KaLaraRuntime
+)
+
 add_executable(KaLaraSmokeTest
     tests/smoke/main.cpp
 )
@@ -158,9 +167,10 @@ add_test(NAME KaLara.Asset COMMAND KaLaraAssetTest)
 add_test(NAME KaLara.Entity COMMAND KaLaraEntityTest)
 add_test(NAME KaLara.Scene COMMAND KaLaraSceneTest)
 add_test(NAME KaLara.InputCamera COMMAND KaLaraInputCameraTest)
+add_test(NAME KaLara.Physics COMMAND KaLaraPhysicsTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
