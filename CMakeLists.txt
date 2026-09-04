@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.4.0
+    VERSION 0.5.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -63,6 +63,8 @@ add_library(KaLaraRuntime STATIC
     runtime/src/Image.cpp
     runtime/src/Texture.cpp
     runtime/src/AssetManager.cpp
+    runtime/src/Registry.cpp
+    runtime/src/Hierarchy.cpp
 )
 
 target_include_directories(KaLaraRuntime
@@ -112,6 +114,14 @@ target_link_libraries(KaLaraAssetTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraEntityTest
+    tests/runtime/EntityTest.cpp
+)
+
+target_link_libraries(KaLaraEntityTest
+    PRIVATE KaLaraRuntime
+)
+
 add_executable(KaLaraSmokeTest
     tests/smoke/main.cpp
 )
@@ -124,9 +134,10 @@ enable_testing()
 add_test(NAME KaLara.Core COMMAND KaLaraCoreTest)
 add_test(NAME KaLara.Renderer COMMAND KaLaraRendererTest)
 add_test(NAME KaLara.Asset COMMAND KaLaraAssetTest)
+add_test(NAME KaLara.Entity COMMAND KaLaraEntityTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
