@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.1.0
+    VERSION 0.2.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -24,6 +24,21 @@ else()
     endif()
 endif()
 
+# Fetch SDL3 dependency
+include(FetchContent)
+FetchContent_Declare(
+    SDL3
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG release-3.2.8
+    GIT_SHALLOW TRUE
+)
+set(SDL_SHARED OFF CACHE BOOL "Build SDL shared library" FORCE)
+set(SDL_STATIC ON CACHE BOOL "Build SDL static library" FORCE)
+set(SDL_TEST OFF CACHE BOOL "Build SDL tests" FORCE)
+FetchContent_MakeAvailable(SDL3)
+
+find_package(OpenGL REQUIRED)
+
 # Core layer static library
 add_library(KaLaraCore STATIC
     core/src/Core.cpp
@@ -39,6 +54,8 @@ target_include_directories(KaLaraCore
 # Runtime layer static library
 add_library(KaLaraRuntime STATIC
     runtime/src/Runtime.cpp
+    runtime/src/Window.cpp
+    runtime/src/Renderer.cpp
 )
 
 target_include_directories(KaLaraRuntime
@@ -47,7 +64,10 @@ target_include_directories(KaLaraRuntime
 )
 
 target_link_libraries(KaLaraRuntime
-    PUBLIC KaLaraCore
+    PUBLIC
+        KaLaraCore
+        SDL3::SDL3
+        OpenGL::GL
 )
 
 # Editor layer executable target

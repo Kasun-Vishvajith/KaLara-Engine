@@ -13,7 +13,8 @@ int main() {
     assert(init_ok);
     assert(runtime.is_running());
 
-    runtime.run_frame();
+    runtime.update(0.016);
+    runtime.render();
 
     runtime.shutdown();
     assert(!runtime.is_running());

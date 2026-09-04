@@ -5,8 +5,9 @@
 int main() {
     kalara::core::EngineConfig config{};
     config.app_name = "KaLara Editor";
-    config.window_width = 1600;
-    config.window_height = 900;
+    config.window_width = 1280;
+    config.window_height = 720;
+    config.vsync = true;
     config.log_level = kalara::core::LogLevel::Info;
 
     kalara::runtime::ApplicationRuntime app;
@@ -15,11 +16,9 @@ int main() {
         return 1;
     }
 
-    KALARA_LOG_INFO("KaLara Editor running (foundation v{}).", kalara::core::version());
+    KALARA_LOG_INFO("Starting KaLara Editor main loop (foundation v{}). Press ESC to quit.", kalara::core::version());
     
-    // Simulate initial frame cycles
-    app.run_frame();
-    app.run_frame();
+    app.run();
 
     app.shutdown();
     return 0;

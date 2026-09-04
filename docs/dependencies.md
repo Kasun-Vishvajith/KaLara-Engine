@@ -37,9 +37,9 @@ The project will keep dependency configuration in `vcpkg.json` and `vcpkg-config
 
 Add:
 
-- SDL3
+- SDL3 (version 3.2.8 via CMake FetchContent / release target)
 
-Use SDL3 for window creation and input abstraction. SDL3 officially supports CMake and Visual Studio on Windows. The project will use the SDL3 package target rather than scattering platform-specific window code through KaLara.
+Use SDL3 for window creation, OpenGL context creation, and input abstraction. SDL3 officially supports CMake and Visual Studio on Windows. The project links the `SDL3::SDL3` CMake target.
 
 ### Rendering
 
