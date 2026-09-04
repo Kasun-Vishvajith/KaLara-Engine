@@ -31,6 +31,19 @@
         "CMAKE_CXX_STANDARD_REQUIRED": "ON",
         "KALARA_WARNINGS_AS_ERRORS": "OFF"
       }
+    },
+    {
+      "name": "windows-mingw",
+      "displayName": "Windows MinGW / GCC",
+      "description": "Standalone local GCC build preset using MinGW-w64.",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/windows-mingw",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_STANDARD": "20",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "KALARA_WARNINGS_AS_ERRORS": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -52,6 +65,10 @@
     {
       "name": "windows-ninja-debug",
       "configurePreset": "windows-ninja"
+    },
+    {
+      "name": "windows-mingw-debug",
+      "configurePreset": "windows-mingw"
     }
   ],
   "testPresets": [
@@ -66,6 +83,13 @@
     {
       "name": "windows-ninja-debug",
       "configurePreset": "windows-ninja",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-mingw-debug",
+      "configurePreset": "windows-mingw",
       "output": {
         "outputOnFailure": true
       }

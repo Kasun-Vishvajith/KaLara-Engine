@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.0.0
+    VERSION 0.1.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
 
-# KaLara is intentionally tiny at Step 00. The first milestone only proves
-# that the repository/toolchain can configure and build safely.
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -26,10 +24,11 @@ else()
     endif()
 endif()
 
-# Keep the initial target structure explicit. Each layer will become its own
-# library as implementation begins.
+# Core layer static library
 add_library(KaLaraCore STATIC
     core/src/Core.cpp
+    core/src/Log.cpp
+    core/src/Config.cpp
 )
 
 target_include_directories(KaLaraCore
@@ -37,19 +36,21 @@ target_include_directories(KaLaraCore
         ${CMAKE_CURRENT_SOURCE_DIR}/core/include
 )
 
+# Runtime layer static library
 add_library(KaLaraRuntime STATIC
-    engine/src/Runtime.cpp
+    runtime/src/Runtime.cpp
 )
 
 target_include_directories(KaLaraRuntime
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/engine/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
 )
 
 target_link_libraries(KaLaraRuntime
     PUBLIC KaLaraCore
 )
 
+# Editor layer executable target
 add_executable(KaLaraEditor
     editor/src/main.cpp
 )
@@ -58,19 +59,28 @@ target_link_libraries(KaLaraEditor
     PRIVATE KaLaraRuntime
 )
 
-# Step 00 test executable. Keep tests independent of future engine systems.
+# Unit test targets
+add_executable(KaLaraCoreTest
+    tests/core/CoreTest.cpp
+)
+
+target_link_libraries(KaLaraCoreTest
+    PRIVATE KaLaraCore
+)
+
 add_executable(KaLaraSmokeTest
     tests/smoke/main.cpp
 )
 
 target_link_libraries(KaLaraSmokeTest
-    PRIVATE KaLaraCore
+    PRIVATE KaLaraRuntime
 )
 
 enable_testing()
+add_test(NAME KaLara.Core COMMAND KaLaraCoreTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
-# Safe output layout for multi-config generators such as Visual Studio.
-set_target_properties(KaLaraEditor KaLaraSmokeTest PROPERTIES
+# Safe output layout for build artifacts
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
