@@ -16,6 +16,7 @@ public:
     ~Registry() = default;
 
     EntityID create_entity(std::string_view name = "Entity");
+    EntityID create_entity_with_id(EntityID id, std::string_view name = "Entity");
     void destroy_entity(EntityID entity_id);
     [[nodiscard]] bool valid(EntityID entity_id) const noexcept;
 

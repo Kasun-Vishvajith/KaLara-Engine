@@ -6,13 +6,18 @@ namespace kalara::runtime {
 
 EntityID Registry::create_entity(std::string_view name) {
     EntityID entity_id = core::UUID::generate();
-    m_entities.push_back(entity_id);
+    return create_entity_with_id(entity_id, name);
+}
 
-    add_component<TagComponent>(entity_id, std::string(name));
-    add_component<TransformComponent>(entity_id);
+EntityID Registry::create_entity_with_id(EntityID id, std::string_view name) {
+    if (valid(id)) return id;
 
-    KALARA_LOG_INFO("Created entity '{}' [{}]", name, core::UUID::format_entity_id(entity_id));
-    return entity_id;
+    m_entities.push_back(id);
+    add_component<TagComponent>(id, std::string(name));
+    add_component<TransformComponent>(id);
+
+    KALARA_LOG_INFO("Created entity '{}' [{}]", name, core::UUID::format_entity_id(id));
+    return id;
 }
 
 bool Registry::valid(EntityID entity_id) const noexcept {
