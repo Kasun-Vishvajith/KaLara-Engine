@@ -6,26 +6,32 @@
 namespace kalara::runtime {
 
 void Renderer::initialize(uint32_t width, uint32_t height) noexcept {
-    set_viewport(width, height);
-    KALARA_LOG_INFO("Renderer initialized (OpenGL backend).");
+    set_viewport({0, 0, width, height});
+    KALARA_LOG_INFO("OpenGL Renderer initialized with viewport {}x{}.", width, height);
 }
 
-void Renderer::set_viewport(uint32_t width, uint32_t height) noexcept {
-    glViewport(0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+void Renderer::set_viewport(const Viewport& viewport) noexcept {
+    m_viewport = viewport;
+    glViewport(static_cast<GLint>(viewport.x), static_cast<GLint>(viewport.y),
+               static_cast<GLsizei>(viewport.width), static_cast<GLsizei>(viewport.height));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, static_cast<double>(width), static_cast<double>(height), 0.0, -1.0, 1.0);
+    glOrtho(0.0, static_cast<double>(viewport.width), static_cast<double>(viewport.height), 0.0, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
-void Renderer::begin_frame(const Color& clear_color) noexcept {
-    glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
+void Renderer::set_clear_color(const core::Vector4& color) noexcept {
+    m_clear_color = color;
+}
+
+void Renderer::begin_frame() noexcept {
+    glClearColor(m_clear_color.x, m_clear_color.y, m_clear_color.z, m_clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::draw_rectangle(float x, float y, float width, float height, const Color& color) noexcept {
-    glColor4f(color.r, color.g, color.b, color.a);
+void Renderer::draw_quad(float x, float y, float width, float height, const core::Vector4& color) noexcept {
+    glColor4f(color.x, color.y, color.z, color.w);
     glBegin(GL_QUADS);
         glVertex2f(x, y);
         glVertex2f(x + width, y);
@@ -34,8 +40,25 @@ void Renderer::draw_rectangle(float x, float y, float width, float height, const
     glEnd();
 }
 
+void Renderer::draw_triangle(const core::Vector2& p1, const core::Vector2& p2, const core::Vector2& p3, const core::Vector4& color) noexcept {
+    glColor4f(color.x, color.y, color.z, color.w);
+    glBegin(GL_TRIANGLES);
+        glVertex2f(p1.x, p1.y);
+        glVertex2f(p2.x, p2.y);
+        glVertex2f(p3.x, p3.y);
+    glEnd();
+}
+
+void Renderer::draw_line(const core::Vector2& p1, const core::Vector2& p2, const core::Vector4& color, float thickness) noexcept {
+    glLineWidth(thickness);
+    glColor4f(color.x, color.y, color.z, color.w);
+    glBegin(GL_LINES);
+        glVertex2f(p1.x, p1.y);
+        glVertex2f(p2.x, p2.y);
+    glEnd();
+}
+
 void Renderer::end_frame() noexcept {
-    // Frame commands completed
 }
 
 } // namespace kalara::runtime

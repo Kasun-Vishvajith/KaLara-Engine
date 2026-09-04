@@ -1,4 +1,5 @@
 #include "kalara/Runtime.hpp"
+#include "kalara/Renderer.hpp"
 #include "kalara/Log.hpp"
 
 namespace kalara::runtime {
@@ -40,7 +41,7 @@ bool ApplicationRuntime::initialize(const core::EngineConfig& config) noexcept {
 void ApplicationRuntime::run() noexcept {
     KALARA_LOG_INFO("Entering main application loop.");
     
-    double delta_time = 1.0 / 60.0; // Fixed delta time for baseline
+    double delta_time = 1.0 / 60.0;
     while (m_running) {
         if (m_window) {
             m_window->poll_events(m_running);
@@ -66,16 +67,20 @@ void ApplicationRuntime::update([[maybe_unused]] double delta_time) noexcept {
 void ApplicationRuntime::render() noexcept {
     if (!m_renderer || !m_window) return;
 
-    // Dark clear background
-    m_renderer->begin_frame({0.12f, 0.14f, 0.18f, 1.0f});
+    m_renderer->begin_frame();
 
-    // Visible proof: draw one centered rectangle (teal color)
-    float rect_w = 200.0f;
-    float rect_h = 150.0f;
-    float center_x = (static_cast<float>(m_window->width()) - rect_w) * 0.5f;
-    float center_y = (static_cast<float>(m_window->height()) - rect_h) * 0.5f;
+    // Render 2D geometry primitives via IRenderer abstraction
+    float win_w = static_cast<float>(m_window->width());
+    float win_h = static_cast<float>(m_window->height());
 
-    m_renderer->draw_rectangle(center_x, center_y, rect_w, rect_h, {0.2f, 0.75f, 0.65f, 1.0f});
+    // Central Quad
+    m_renderer->draw_quad((win_w - 200.0f) * 0.5f, (win_h - 150.0f) * 0.5f, 200.0f, 150.0f, {0.2f, 0.75f, 0.65f, 1.0f});
+
+    // Top Triangle
+    m_renderer->draw_triangle({win_w * 0.5f, 100.0f}, {win_w * 0.5f - 80.0f, 200.0f}, {win_w * 0.5f + 80.0f, 200.0f}, {0.9f, 0.35f, 0.35f, 1.0f});
+
+    // Border Line
+    m_renderer->draw_line({50.0f, win_h - 50.0f}, {win_w - 50.0f, win_h - 50.0f}, {0.95f, 0.85f, 0.3f, 1.0f}, 3.0f);
 
     m_renderer->end_frame();
 }
