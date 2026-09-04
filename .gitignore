@@ -1,0 +1,77 @@
+# ===== Build outputs =====
+build/
+out/
+dist/
+cmake-build-*/
+
+# ===== CMake / tooling generated files =====
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.VC.opendb
+ipch/
+
+# ===== VS Code =====
+.vscode/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+tools/python/.venv/
+tools/python/venv/
+
+# ===== Local environment / secrets =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Logs / dumps =====
+*.log
+*.dmp
+*.stackdump
+
+# ===== Temporary files =====
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===== Dependency/build caches =====
+vcpkg_installed/
+.cache/
+.nuget/
+
+# ===== Local agent state =====
+.agent/
+.codex/
+.claude/
+.cursor/
+
+# Keep source-controlled project configuration visible.
+!CMakePresets.json
+!vcpkg.json
+!vcpkg-configuration.json

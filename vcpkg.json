@@ -1,0 +1,7 @@
+{
+  "name": "kalara",
+  "version-string": "0.0.0",
+  "description": "KaLara game engine development dependencies",
+  "license": "Apache-2.0",
+  "dependencies": []
+}

@@ -1,0 +1,4 @@
+{
+  "$comment": "Step 00 intentionally has no C++ runtime packages. Dependencies will be added one at a time and pinned before each milestone that needs them.",
+  "registries": []
+}
