@@ -21,6 +21,7 @@ public:
     virtual void set_clear_color(const core::Vector4& color) noexcept = 0;
     virtual void begin_frame() noexcept = 0;
     virtual void draw_quad(float x, float y, float width, float height, const core::Vector4& color) noexcept = 0;
+    virtual void draw_textured_quad(float x, float y, float width, float height, uint32_t texture_id, const core::Vector4& tint = {1.0f, 1.0f, 1.0f, 1.0f}) noexcept = 0;
     virtual void draw_triangle(const core::Vector2& p1, const core::Vector2& p2, const core::Vector2& p3, const core::Vector4& color) noexcept = 0;
     virtual void draw_line(const core::Vector2& p1, const core::Vector2& p2, const core::Vector4& color, float thickness = 1.0f) noexcept = 0;
     virtual void end_frame() noexcept = 0;

@@ -7,7 +7,9 @@ namespace kalara::runtime {
 
 void Renderer::initialize(uint32_t width, uint32_t height) noexcept {
     set_viewport({0, 0, width, height});
-    KALARA_LOG_INFO("OpenGL Renderer initialized with viewport {}x{}.", width, height);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    KALARA_LOG_INFO("OpenGL Renderer initialized with viewport {}x{} (Blending enabled).", width, height);
 }
 
 void Renderer::set_viewport(const Viewport& viewport) noexcept {
@@ -31,6 +33,7 @@ void Renderer::begin_frame() noexcept {
 }
 
 void Renderer::draw_quad(float x, float y, float width, float height, const core::Vector4& color) noexcept {
+    glDisable(GL_TEXTURE_2D);
     glColor4f(color.x, color.y, color.z, color.w);
     glBegin(GL_QUADS);
         glVertex2f(x, y);
@@ -40,7 +43,28 @@ void Renderer::draw_quad(float x, float y, float width, float height, const core
     glEnd();
 }
 
+void Renderer::draw_textured_quad(float x, float y, float width, float height, uint32_t texture_id, const core::Vector4& tint) noexcept {
+    if (texture_id == 0) {
+        draw_quad(x, y, width, height, tint);
+        return;
+    }
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+    glColor4f(tint.x, tint.y, tint.z, tint.w);
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(x + width, y);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(x + width, y + height);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(x, y + height);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+}
+
 void Renderer::draw_triangle(const core::Vector2& p1, const core::Vector2& p2, const core::Vector2& p3, const core::Vector4& color) noexcept {
+    glDisable(GL_TEXTURE_2D);
     glColor4f(color.x, color.y, color.z, color.w);
     glBegin(GL_TRIANGLES);
         glVertex2f(p1.x, p1.y);
@@ -50,6 +74,7 @@ void Renderer::draw_triangle(const core::Vector2& p1, const core::Vector2& p2, c
 }
 
 void Renderer::draw_line(const core::Vector2& p1, const core::Vector2& p2, const core::Vector4& color, float thickness) noexcept {
+    glDisable(GL_TEXTURE_2D);
     glLineWidth(thickness);
     glColor4f(color.x, color.y, color.z, color.w);
     glBegin(GL_LINES);

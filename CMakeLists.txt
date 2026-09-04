@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -44,6 +44,7 @@ add_library(KaLaraCore STATIC
     core/src/Core.cpp
     core/src/Log.cpp
     core/src/Config.cpp
+    core/src/UUID.cpp
 )
 
 target_include_directories(KaLaraCore
@@ -59,11 +60,15 @@ add_library(KaLaraRuntime STATIC
     runtime/src/Buffer.cpp
     runtime/src/VertexArray.cpp
     runtime/src/Shader.cpp
+    runtime/src/Image.cpp
+    runtime/src/Texture.cpp
+    runtime/src/AssetManager.cpp
 )
 
 target_include_directories(KaLaraRuntime
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
 
 target_link_libraries(KaLaraRuntime
@@ -99,6 +104,14 @@ target_link_libraries(KaLaraRendererTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraAssetTest
+    tests/runtime/AssetTest.cpp
+)
+
+target_link_libraries(KaLaraAssetTest
+    PRIVATE KaLaraRuntime
+)
+
 add_executable(KaLaraSmokeTest
     tests/smoke/main.cpp
 )
@@ -110,9 +123,10 @@ target_link_libraries(KaLaraSmokeTest
 enable_testing()
 add_test(NAME KaLara.Core COMMAND KaLaraCoreTest)
 add_test(NAME KaLara.Renderer COMMAND KaLaraRendererTest)
+add_test(NAME KaLara.Asset COMMAND KaLaraAssetTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )

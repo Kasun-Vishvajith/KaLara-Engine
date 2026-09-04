@@ -14,6 +14,7 @@ public:
     void set_clear_color(const core::Vector4& color) noexcept override;
     void begin_frame() noexcept override;
     void draw_quad(float x, float y, float width, float height, const core::Vector4& color) noexcept override;
+    void draw_textured_quad(float x, float y, float width, float height, uint32_t texture_id, const core::Vector4& tint = {1.0f, 1.0f, 1.0f, 1.0f}) noexcept override;
     void draw_triangle(const core::Vector2& p1, const core::Vector2& p2, const core::Vector2& p3, const core::Vector4& color) noexcept override;
     void draw_line(const core::Vector2& p1, const core::Vector2& p2, const core::Vector4& color, float thickness = 1.0f) noexcept override;
     void end_frame() noexcept override;
