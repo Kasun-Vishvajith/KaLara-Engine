@@ -17,6 +17,7 @@ public:
     void update(double delta_time) noexcept;
     void render() noexcept;
     void shutdown() noexcept;
+    void request_quit() noexcept { m_running = false; }
 
     [[nodiscard]] bool is_running() const noexcept { return m_running; }
     [[nodiscard]] const core::EngineConfig& config() const noexcept { return m_config; }

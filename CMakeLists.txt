@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.16.0
+    VERSION 0.17.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -79,11 +79,13 @@ add_library(KaLaraRuntime STATIC
     runtime/src/ProjectTemplate.cpp
     runtime/src/ProjectState.cpp
     runtime/src/UndoRedoManager.cpp
+    exporter/src/Exporter.cpp
 )
 
 target_include_directories(KaLaraRuntime
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/runtime/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/exporter/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
 
@@ -92,6 +94,15 @@ target_link_libraries(KaLaraRuntime
         KaLaraCore
         SDL3::SDL3
         OpenGL::GL
+)
+
+# Standalone Runtime Game Target (no editor dependencies)
+add_executable(KaLaraRuntimeGame
+    runtime/src/main_standalone.cpp
+)
+
+target_link_libraries(KaLaraRuntimeGame
+    PRIVATE KaLaraRuntime
 )
 
 # Editor layer static library
@@ -234,6 +245,14 @@ target_link_libraries(KaLaraUndoTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraExportTest
+    tests/exporter/WindowsExportTest.cpp
+)
+
+target_link_libraries(KaLaraExportTest
+    PRIVATE KaLaraRuntime
+)
+
 add_executable(KaLaraEditorTest
     tests/editor/EditorFoundationTest.cpp
 )
@@ -265,10 +284,11 @@ add_test(NAME KaLara.Behavior COMMAND KaLaraBehaviorTest)
 add_test(NAME KaLara.Template COMMAND KaLaraTemplateTest)
 add_test(NAME KaLara.History COMMAND KaLaraHistoryTest)
 add_test(NAME KaLara.Undo COMMAND KaLaraUndoTest)
+add_test(NAME KaLara.Export COMMAND KaLaraExportTest)
 add_test(NAME KaLara.Editor COMMAND KaLaraEditorTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraSemanticTest KaLaraCSharpTest KaLaraBehaviorTest KaLaraTemplateTest KaLaraHistoryTest KaLaraUndoTest KaLaraEditorTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraRuntimeGame KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraSemanticTest KaLaraCSharpTest KaLaraBehaviorTest KaLaraTemplateTest KaLaraHistoryTest KaLaraUndoTest KaLaraExportTest KaLaraEditorTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
