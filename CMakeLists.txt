@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(KaLara
-    VERSION 0.15.0
+    VERSION 0.16.0
     DESCRIPTION "KaLara — human-first, AI-native 2D game engine"
     LANGUAGES CXX
 )
@@ -78,6 +78,7 @@ add_library(KaLaraRuntime STATIC
     runtime/src/BehaviorSystem.cpp
     runtime/src/ProjectTemplate.cpp
     runtime/src/ProjectState.cpp
+    runtime/src/UndoRedoManager.cpp
 )
 
 target_include_directories(KaLaraRuntime
@@ -225,6 +226,14 @@ target_link_libraries(KaLaraHistoryTest
     PRIVATE KaLaraRuntime
 )
 
+add_executable(KaLaraUndoTest
+    tests/runtime/TransactionUndoTest.cpp
+)
+
+target_link_libraries(KaLaraUndoTest
+    PRIVATE KaLaraRuntime
+)
+
 add_executable(KaLaraEditorTest
     tests/editor/EditorFoundationTest.cpp
 )
@@ -255,10 +264,11 @@ add_test(NAME KaLara.CSharp COMMAND KaLaraCSharpTest)
 add_test(NAME KaLara.Behavior COMMAND KaLaraBehaviorTest)
 add_test(NAME KaLara.Template COMMAND KaLaraTemplateTest)
 add_test(NAME KaLara.History COMMAND KaLaraHistoryTest)
+add_test(NAME KaLara.Undo COMMAND KaLaraUndoTest)
 add_test(NAME KaLara.Editor COMMAND KaLaraEditorTest)
 add_test(NAME KaLara.Smoke COMMAND KaLaraSmokeTest)
 
 # Safe output layout for build artifacts
-set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraSemanticTest KaLaraCSharpTest KaLaraBehaviorTest KaLaraTemplateTest KaLaraHistoryTest KaLaraEditorTest KaLaraSmokeTest PROPERTIES
+set_target_properties(KaLaraEditor KaLaraCoreTest KaLaraRendererTest KaLaraAssetTest KaLaraEntityTest KaLaraSceneTest KaLaraInputCameraTest KaLaraPhysicsTest KaLaraAnimationTest KaLaraSemanticTest KaLaraCSharpTest KaLaraBehaviorTest KaLaraTemplateTest KaLaraHistoryTest KaLaraUndoTest KaLaraEditorTest KaLaraSmokeTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>"
 )
